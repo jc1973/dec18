@@ -1,0 +1,2 @@
+attach policy: bru_ip_restriction to role: iamrole-api-gateway-porbruitest-bru
+on the api /retrieve method request use: aws_iam authorization
