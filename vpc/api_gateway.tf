@@ -67,7 +67,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
 
 
 resource "aws_iam_role" "iam_for_api_gateway" {
-  name = "iamrole-api-gateway-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
+  name = "iamrole-api-gateway-${ var.sub_project }${ var.environment }-${ var.service }"
   path = "/"
   assume_role_policy = <<EOF
 {
@@ -88,7 +88,7 @@ EOF
 
 resource "aws_iam_role_policy" "iam_policy_api_gateway" {
   role = "${aws_iam_role.iam_for_api_gateway.id}"
-  name = "iamrole-api-gateway-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
+  name = "iamrole-api-gateway-${ var.sub_project }${ var.environment }-${ var.service }"
   policy = <<EOF
 {
 

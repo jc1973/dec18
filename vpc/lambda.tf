@@ -6,7 +6,7 @@ data "archive_file" "lambda" {
 
 resource "aws_lambda_function" "hello_world_lambda_function" {
   filename = "${data.archive_file.lambda.output_path}"
-  function_name = "lambda-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }-retrieve"
+  function_name = "lambda-${ var.sub_project }${ var.environment }-${ var.service }-retrieve"
   role = "${aws_iam_role.lambda_role.arn}"
   handler = "index.handler"
   runtime = "nodejs4.3"
@@ -22,7 +22,7 @@ resource "aws_lambda_permission" "allow_aws_api_gateway" {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "iamrole-lambda-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
+  name = "iamrole-lambda-${ var.sub_project }${ var.environment }-${ var.service }"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -41,7 +41,7 @@ EOF
 
 resource "aws_iam_role_policy" "iam_policy_lambda_role" {
   role = "${aws_iam_role.lambda_role.id}"
-  name = "iampolicy-lambda_role-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
+  name = "iampolicy-lambda_role-${ var.sub_project }${ var.environment }-${ var.service }"
   policy = <<EOF
 {
     "Version": "2012-10-17",
