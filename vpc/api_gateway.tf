@@ -24,7 +24,7 @@ resource "aws_api_gateway_method" "hello_world_method" {
 }
 
 
-# an integration to call the lambda function on the / endpoint
+# an integration to call the lambda function on the endpoint
 resource "aws_api_gateway_integration" "hello_world_lambda_integration" {
   rest_api_id          = "${aws_api_gateway_rest_api.hello_world.id}"
   resource_id          = "${aws_api_gateway_method.hello_world_method.resource_id}"
@@ -35,21 +35,35 @@ resource "aws_api_gateway_integration" "hello_world_lambda_integration" {
 }
 
 
-
-# # an integration to call AWS service (this should call the lambda function) on the / endpoint
-# resource "aws_api_gateway_integration" "hello_world_recieve_lambda_integration" {
-#   rest_api_id          = "${aws_api_gateway_rest_api.hello_world_api.id}"
-#   resource_id          = "${aws_api_gateway_resource.hello_world_api_resource.id}"
-#   http_method          = "${aws_api_gateway_method.hello_world_api_method.http_method}"
-#   uri                  = "${aws_lambda_function.hello_world_lambda_function.invoke_arn}"
-#   type                 = "AWS_PROXY"
-#   integration_http_method     = "POST"
-#   content_handling     = "CONVERT_TO_TEXT"
-# }
-
 ############################
 ## END ENDPOINT RESOURCES ##
 ############################
+
+
+
+########################################
+## ADD PROXY TO HANDLE EMPTY ENDPOINT ##
+########################################
+
+
+resource "aws_api_gateway_method" "proxy_root" {
+  rest_api_id   = "${aws_api_gateway_rest_api.hello_world.id}"
+  resource_id   = "${aws_api_gateway_rest_api.hello_world.root_resource_id}"
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "lambda_root" {
+  rest_api_id = "${aws_api_gateway_rest_api.hello_world.id}"
+  resource_id = "${aws_api_gateway_method.proxy_root.resource_id}"
+  http_method = "${aws_api_gateway_method.proxy_root.http_method}"
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "${aws_lambda_function.hello_world_lambda_function.invoke_arn}"
+}
+
+
 
 
 resource "aws_iam_role" "iam_for_api_gateway" {
@@ -108,9 +122,10 @@ resource "aws_iam_role_policy_attachment" "hello_world_api_restriction" {
 
 #### DEPLOY THE API'S #####
 
-resource "aws_api_gateway_deployment" "hello_world_api_deployment" {
-  depends_on = ["aws_api_gateway_integration.hello_world_recieve_lambda_integration"]
-  rest_api_id = "${aws_api_gateway_rest_api.hello_world_api.id}"
+resource "aws_api_gateway_deployment" "hello_world_deployment" {
+  depends_on = ["aws_api_gateway_integration.hello_world_lambda_integration", 
+                "aws_api_gateway_integration.lambda_root"]
+  rest_api_id = "${aws_api_gateway_rest_api.hello_world.id}"
   stage_name  = "${var.environment}"
 }
 
@@ -198,3 +213,8 @@ resource "aws_api_gateway_deployment" "hello_world_api_deployment" {
 #   value = "${aws_iam_role_policy.iam_policy_api_gateway.id}"
 # }
 # 
+
+output "root_url" {
+  value = "${aws_api_gateway_deployment.hello_world_deployment.invoke_url}"
+}
+
