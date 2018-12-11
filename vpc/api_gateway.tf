@@ -1,7 +1,7 @@
 # Define API root
 resource "aws_api_gateway_rest_api" "hello_world_api" {
   name = "HELLO_WORLD_API_${var.environment}"
-  description = "Biometric Re-use Rest Api"
+  description = "Hello World Api"
 }
 
 ##########################
@@ -9,16 +9,16 @@ resource "aws_api_gateway_rest_api" "hello_world_api" {
 ##########################
 
 # resource to represent the / endpoint - the step function trigger
-resource "aws_api_gateway_resource" "hello_world_retrieve_api_resource" {
+resource "aws_api_gateway_resource" "hello_world_api_resource" {
   rest_api_id = "${aws_api_gateway_rest_api.hello_world_api.id}"
   parent_id   = "${aws_api_gateway_rest_api.hello_world_api.root_resource_id}"
   path_part   = ""
 }
 
 #  a method to handle POST on the / endpoint
-resource "aws_api_gateway_method" "hello_world_retrieve_api_method" {
+resource "aws_api_gateway_method" "hello_world_api_method" {
   rest_api_id   = "${aws_api_gateway_rest_api.hello_world_api.id}"
-  resource_id   = "${aws_api_gateway_resource.hello_world_retrieve_api_resource.id}"
+  resource_id   = "${aws_api_gateway_resource.hello_world_api_resource.id}"
   http_method   = "GET"
   authorization = "AWS_IAM"
 }
@@ -26,17 +26,17 @@ resource "aws_api_gateway_method" "hello_world_retrieve_api_method" {
 # a method to handle a 200 respone on the / endpoint
 resource "aws_api_gateway_method_response" "retrieve_200" {
   rest_api_id = "${aws_api_gateway_rest_api.hello_world_api.id}"
-  resource_id = "${aws_api_gateway_resource.hello_world_retrieve_api_resource.id}"
-  http_method = "${aws_api_gateway_method.hello_world_retrieve_api_method.http_method}"
+  resource_id = "${aws_api_gateway_resource.hello_world_api_resource.id}"
+  http_method = "${aws_api_gateway_method.hello_world_api_method.http_method}"
   status_code = "200"
   depends_on = ["aws_api_gateway_integration.hello_world_recieve_lambda_integration"]
 }
 
 ## handle the integration response on the / endpoint
-resource "aws_api_gateway_integration_response" "hello_world_retrieve_api_integration_response" {
+resource "aws_api_gateway_integration_response" "hello_world_api_integration_response" {
   rest_api_id = "${aws_api_gateway_rest_api.hello_world_api.id}"
-  resource_id = "${aws_api_gateway_resource.hello_world_retrieve_api_resource.id}"
-  http_method = "${aws_api_gateway_method.hello_world_retrieve_api_method.http_method}"
+  resource_id = "${aws_api_gateway_resource.hello_world_api_resource.id}"
+  http_method = "${aws_api_gateway_method.hello_world_api_method.http_method}"
   status_code = "${aws_api_gateway_method_response.retrieve_200.status_code}"
   depends_on  = ["aws_api_gateway_integration.hello_world_recieve_lambda_integration"]
 }
@@ -44,9 +44,9 @@ resource "aws_api_gateway_integration_response" "hello_world_retrieve_api_integr
 # an integration to call AWS service (this should call the lambda function) on the / endpoint
 resource "aws_api_gateway_integration" "hello_world_recieve_lambda_integration" {
   rest_api_id          = "${aws_api_gateway_rest_api.hello_world_api.id}"
-  resource_id          = "${aws_api_gateway_resource.hello_world_retrieve_api_resource.id}"
-  http_method          = "${aws_api_gateway_method.hello_world_retrieve_api_method.http_method}"
-  uri                  = "${aws_lambda_function.hello_world_retrieve_lambda_function.invoke_arn}"
+  resource_id          = "${aws_api_gateway_resource.hello_world_api_resource.id}"
+  http_method          = "${aws_api_gateway_method.hello_world_api_method.http_method}"
+  uri                  = "${aws_lambda_function.hello_world_lambda_function.invoke_arn}"
   type                 = "AWS_PROXY"
   integration_http_method     = "POST"
   content_handling     = "CONVERT_TO_TEXT"
@@ -58,7 +58,7 @@ resource "aws_api_gateway_integration" "hello_world_recieve_lambda_integration" 
 
 
 resource "aws_iam_role" "iam_for_api_gateway" {
-  name = "iamrole-api-gateway-${ var.stream_code }${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
+  name = "iamrole-api-gateway-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
   path = "/"
   assume_role_policy = <<EOF
 {
@@ -79,7 +79,7 @@ EOF
 
 resource "aws_iam_role_policy" "iam_policy_api_gateway" {
   role = "${aws_iam_role.iam_for_api_gateway.id}"
-  name = "iamrole-api-gateway-${ var.stream_code }${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
+  name = "iamrole-api-gateway-${ var.sub_project }${ var.int_ext }${ var.environment }-${ var.service }"
   policy = <<EOF
 {
 
@@ -151,24 +151,24 @@ output "aws_api_gateway_integration.hello_world_recieve_lambda_integration.passt
   value = "${aws_api_gateway_integration.hello_world_recieve_lambda_integration.passthrough_behavior}"
 }
 
-output "aws_api_gateway_integration_response.hello_world_retrieve_api_integration_response.id" {
-  value = "${aws_api_gateway_integration_response.hello_world_retrieve_api_integration_response.id}"
+output "aws_api_gateway_integration_response.hello_world_api_integration_response.id" {
+  value = "${aws_api_gateway_integration_response.hello_world_api_integration_response.id}"
 }
 
-output "aws_api_gateway_method.hello_world_retrieve_api_method.id" {
-  value = "${aws_api_gateway_method.hello_world_retrieve_api_method.id}"
+output "aws_api_gateway_method.hello_world_api_method.id" {
+  value = "${aws_api_gateway_method.hello_world_api_method.id}"
 }
 
 output "aws_api_gateway_method_response.retrieve_200.id" {
   value = "${aws_api_gateway_method_response.retrieve_200.id}"
 }
 
-output "aws_api_gateway_resource.hello_world_retrieve_api_resource.id" {
-  value = "${aws_api_gateway_resource.hello_world_retrieve_api_resource.id}"
+output "aws_api_gateway_resource.hello_world_api_resource.id" {
+  value = "${aws_api_gateway_resource.hello_world_api_resource.id}"
 }
 
-output "aws_api_gateway_resource.hello_world_retrieve_api_resource.path" {
-  value = "${aws_api_gateway_resource.hello_world_retrieve_api_resource.path}"
+output "aws_api_gateway_resource.hello_world_api_resource.path" {
+  value = "${aws_api_gateway_resource.hello_world_api_resource.path}"
 }
 
 output "aws_api_gateway_rest_api.hello_world_api.id" {

@@ -13,7 +13,7 @@ variable "stream_code" {
 
 variable "sub_project" {
   type = "string"
-  default = "bru"
+  default = "hello_world"
 }
 
 variable "int_ext" {
@@ -28,10 +28,10 @@ variable "environment" {
 
 variable "service" {
   type = "string"
-  default = "bru"
+  default = "hello_world"
 }
 
-variable "lambda_retrieve_code_dir" {
+variable "lambda_code_dir" {
   type = "string"
-  default = "../retrieve"
+  default = "../lambda-function"
 }

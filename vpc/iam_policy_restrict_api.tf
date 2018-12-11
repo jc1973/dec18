@@ -1,7 +1,7 @@
-resource "aws_iam_policy" "bru_api_restriction" {
-  name        = "bru_api_restriction"
+resource "aws_iam_policy" "hello_world_api_restriction" {
+  name        = "hello_world_api_restriction"
   path        = "/"
-  description = "Biometric Re-use API restriction"
+  description = "Hello World API restriction"
 
   policy = <<EOF
 {
@@ -21,11 +21,11 @@ EOF
 
 #### OUTPUTS ####
 
-output "aws_iam_policy.bru_api_restriction.id" {
-  value = "${aws_iam_policy.bru_api_restriction.id}"
+output "aws_iam_policy.hello_world_api_restriction.id" {
+  value = "${aws_iam_policy.hello_world_api_restriction.id}"
 }
 
-output "aws_iam_policy.bru_api_restriction.arn" {
-  value = "${aws_iam_policy.bru_api_restriction.arn}"
+output "aws_iam_policy.hello_world_api_restriction.arn" {
+  value = "${aws_iam_policy.hello_world_api_restriction.arn}"
 }
 
