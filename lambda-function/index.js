@@ -10,23 +10,14 @@ exports.handler = function(event, context, callback) {
     let responseCode = 200;
     console.log("request: " + JSON.stringify(event));
 
-    var responseBody = {
-        message: message,
-    };
 
     var response = {
         statusCode: responseCode,
-// We do not need any additional headers
-//         headers: {
-//             "x-custom-header" : "my custom header value"
-//         },
-        body: JSON.stringify(responseBody)
+        body: message
     };
 
 
     console.log("response: " + JSON.stringify(response))
     callback(null, response);
 };
-
-
 
