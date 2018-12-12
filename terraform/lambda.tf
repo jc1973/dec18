@@ -38,7 +38,7 @@ EOF
 resource "aws_lambda_permission" "api_gw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.hello_world_lambda_function.arn}"
+  function_name = "${aws_lambda_function.hello_world_lambda_function.function_name}"
   principal     = "apigateway.amazonaws.com"
 
   # The /*/* portion grants access from any method on any resource
