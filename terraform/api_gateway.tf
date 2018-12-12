@@ -39,3 +39,43 @@ resource "aws_api_gateway_integration" "hello_world_lambda_integration" {
 ## END ENDPOINT RESOURCES ##
 ############################
 
+
+########################################
+## ADD PROXY TO HANDLE EMPTY ENDPOINT ##
+########################################
+
+
+resource "aws_api_gateway_method" "proxy_root" {
+  rest_api_id   = "${aws_api_gateway_rest_api.hello_world.id}"
+  resource_id   = "${aws_api_gateway_rest_api.hello_world.root_resource_id}"
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "lambda_root" {
+  rest_api_id = "${aws_api_gateway_rest_api.hello_world.id}"
+  resource_id = "${aws_api_gateway_method.proxy_root.resource_id}"
+  http_method = "${aws_api_gateway_method.proxy_root.http_method}"
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "${aws_lambda_function.hello_world_lambda_function.invoke_arn}"
+}
+
+
+
+######################################
+## MATCH THE EMPTY PATH AT THE ROOT ##
+######################################
+
+resource "aws_api_gateway_deployment" "hello_world_deployment" {
+  depends_on = [ "aws_api_gateway_integration.hello_world_lambda_integration",
+                 "aws_api_gateway_integration.lambda_root" ]
+  rest_api_id = "${aws_api_gateway_rest_api.hello_world.id}"
+  stage_name  = "${var.environment}"
+}
+
+
+output "root_url" {
+  value = "${aws_api_gateway_deployment.hello_world_deployment.invoke_url}"
+}
+

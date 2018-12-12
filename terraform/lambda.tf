@@ -34,6 +34,19 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
+
+resource "aws_lambda_permission" "api_gw" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.hello_world_lambda_function.arn}"
+  principal     = "apigateway.amazonaws.com"
+
+  # The /*/* portion grants access from any method on any resource
+  # within the API Gateway "REST API".
+  source_arn = "${aws_api_gateway_deployment.hello_world_deployment.execution_arn}/*/*"
+}
+
+
 output "aws_iam_role.lambda_role.id" {
   value = "${aws_iam_role.lambda_role.id}"
 }
